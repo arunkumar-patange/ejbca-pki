@@ -17,10 +17,10 @@ image:
 	$(HIDE)docker build -t $(INAME) .
 	$(HIDE)docker run --name ant-deploy \
 		--link postgres \
-		-v $(PWD):/onelogin/src \
+		-v $(PWD):/ejbca/src \
 		$(INAME)
 	$(HIDE)docker commit ant-deploy $(INAME):deploy
-	#$(HIDE)docker rm ant-deploy
+	$(HIDE)docker rm ant-deploy
 
 start:
 	$(HIDE)docker run -it --name $(CNAME) \
@@ -29,7 +29,7 @@ start:
 		-p 8443:8443 \
 		-p 8442:8442 \
 		-p 9990:9990 \
-		-v $(PWD):/onelogin/src \
+		-v $(PWD):/ejbca/src \
 		-d $(INAME):deploy \
 		/ejbca/src/run.sh
 
