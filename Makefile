@@ -13,6 +13,9 @@ HIDE ?= @
 INAME ?= onelogin/ejbca
 CNAME ?= ejbca
 
+
+PHONY: postgresdb
+
 image:
 	$(HIDE)docker build -t $(INAME) .
 	$(HIDE)docker run --name ant-deploy \
@@ -37,13 +40,12 @@ enter:
 	#$(HIDE)docker attach $(CNAME)
 	$(HIDE)docker exec -it $(CNAME) /bin/bash
 
-
 stop:
 	-$(HIDE)docker rm ant-deploy
 	$(HIDE)docker stop $(CNAME)
 	$(HIDE)docker rm $(CNAME)
 
-postgres:
+postgresdb:
 	$(HIDE)docker run --name postgres -e POSTGRES_PASSWORD=postgres -d postgres
 
 sh:
