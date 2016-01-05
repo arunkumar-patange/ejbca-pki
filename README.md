@@ -15,5 +15,5 @@ UBUNTU
 [http://localhost:8080/ejbca](http://localhost:8080:/ejbca)
 
 OSX
-get the `ip-address` using `docker-machine  ip default`  and go to
-[http://<ip-address>:8080/ejbca](http://<ip-address>:8080/ejbca)
+get the **ip-address** using `docker-machine  ip default`  and go to
+[http://**ip-address**:8080/ejbca](http://ip-address:8080/ejbca)
