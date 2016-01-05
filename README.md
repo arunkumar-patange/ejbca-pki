@@ -7,7 +7,7 @@ Onelogin PKI
 ## [Installation Guide](https://www.ejbca.org/docs/installation.html)
 
 ## Quick Installation using [docker](https://docs.docker.com/engine/installation/mac/)
-`make postgres`
+`make postgresdb`
 `make image`
 `make start`
 
