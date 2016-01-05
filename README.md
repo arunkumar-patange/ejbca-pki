@@ -2,7 +2,7 @@
 # EJBCA
 Enterprise Java Beans Certificate Authority
 
-Onelogin PKI
+PKI
 
 ## [Installation Guide](https://www.ejbca.org/docs/installation.html)
 
