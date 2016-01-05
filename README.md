@@ -16,4 +16,4 @@ UBUNTU
 
 OSX
 get the `ip-address` using `docker-machine  ip default`  and go to
-[http://<ip-address>:8080/ejbca](http://<ip-address>:8080:/ejbca)
+[http://<ip-address>:8080/ejbca](http://<ip-address>:8080/ejbca)
