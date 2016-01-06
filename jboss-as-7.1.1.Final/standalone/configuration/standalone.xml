@@ -1,7 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
 <server xmlns="urn:jboss:domain:1.2">
-
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.configadmin"/>
@@ -27,12 +26,6 @@
         <extension module="org.jboss.as.webservices"/>
         <extension module="org.jboss.as.weld"/>
     </extensions>
-
-    <system-properties>
-        <property name="org.apache.catalina.connector.URI_ENCODING" value="UTF-8"/>
-        <property name="org.apache.catalina.connector.USE_BODY_ENCODING_FOR_QUERY_STRING" value="true"/>
-    </system-properties>
-
     <management>
         <security-realms>
             <security-realm name="ManagementRealm">
@@ -55,7 +48,6 @@
             </http-interface>
         </management-interfaces>
     </management>
-
     <profile>
         <subsystem xmlns="urn:jboss:domain:logging:1.1">
             <console-handler name="CONSOLE">
@@ -106,35 +98,9 @@
                         <password>sa</password>
                     </security>
                 </datasource>
-                <datasource jndi-name="java:/EjbcaDS" pool-name="ejbcads" use-ccm="true">
-                    <connection-url>jdbc:postgresql://postgres:5432/ejbca</connection-url>
-                    <driver>org.postgresql.Driver</driver>
-                    <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
-                    <pool>
-                        <min-pool-size>5</min-pool-size>
-                        <max-pool-size>150</max-pool-size>
-                        <prefill>true</prefill>
-                    </pool>
-                    <security>
-                        <user-name>ejbca</user-name>
-                        <password>ejbca</password>
-                    </security>
-                    <validation>
-                        <check-valid-connection-sql>select 1</check-valid-connection-sql>
-                        <validate-on-match>true</validate-on-match>
-                        <background-validation>false</background-validation>
-                    </validation>
-                    <statement>
-                        <prepared-statement-cache-size>50</prepared-statement-cache-size>
-                        <share-prepared-statements>true</share-prepared-statements>
-                    </statement>
-                </datasource>
                 <drivers>
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
-                    </driver>
-                    <driver name="org.postgresql.Driver" module="org.postgresql">
-                        <xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>
                     </driver>
                 </drivers>
             </datasources>
@@ -226,20 +192,18 @@
             <mail-session jndi-name="java:jboss/mail/Default">
                 <smtp-server outbound-socket-binding-ref="mail-smtp"/>
             </mail-session>
-            <mail-session jndi-name="java:/EjbcaMail" from="ejbca-donotreply@domain.com">
-                <smtp-server outbound-socket-binding-ref="ejbca-mail-smtp"/>
-            </mail-session>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:naming:1.1"/>
         <subsystem xmlns="urn:jboss:domain:osgi:1.2" activation="lazy">
             <properties>
-                <property name="org.osgi.framework.startlevel.beginning">
-                    1
-                </property>
+                <!-- Specifies the beginning start level of the framework -->
+                <property name="org.osgi.framework.startlevel.beginning">1</property>
             </properties>
             <capabilities>
+                <!-- modules registered with the OSGi layer on startup -->
                 <capability name="javax.servlet.api:v25"/>
                 <capability name="javax.transaction.api"/>
+                <!-- bundles started in startlevel 1 -->
                 <capability name="org.apache.felix.log" startlevel="1"/>
                 <capability name="org.jboss.osgi.logging" startlevel="1"/>
                 <capability name="org.apache.felix.configadmin" startlevel="1"/>
@@ -290,13 +254,7 @@
             <coordinator-environment default-timeout="300"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:web:1.1" default-virtual-server="default-host" native="false">
-            <connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http" redirect-port="8443"/>
-            <connector name="httpspriv" protocol="HTTP/1.1" scheme="https" socket-binding="httpspriv" secure="true">
-                <ssl key-alias="localhost" password="serverpwd" certificate-key-file="/ejbca/src/jboss-as-7.1.1.Final/standalone/configuration/keystore/keystore.jks" protocol="TLSv1,TLSv1.1,TLSv1.2" verify-client="true" ca-certificate-file="/ejbca/src/jboss-as-7.1.1.Final/standalone/configuration/keystore/truststore.jks" ca-certificate-password="changeit"/>
-            </connector>
-            <connector name="httpspub" protocol="HTTP/1.1" scheme="https" socket-binding="httpspub" secure="true">
-                <ssl key-alias="localhost" password="serverpwd" certificate-key-file="/ejbca/src/jboss-as-7.1.1.Final/standalone/configuration/keystore/keystore.jks" protocol="TLSv1,TLSv1.1,TLSv1.2"/>
-            </connector>
+            <connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http"/>
             <virtual-server name="default-host" enable-welcome-root="true">
                 <alias name="localhost"/>
                 <alias name="example.com"/>
@@ -304,7 +262,7 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:webservices:1.1">
             <modify-wsdl-address>true</modify-wsdl-address>
-            <wsdl-host>jbossws.undefined.host</wsdl-host>
+            <wsdl-host>${jboss.bind.address:127.0.0.1}</wsdl-host>
             <endpoint-config name="Standard-Endpoint-Config"/>
             <endpoint-config name="Recording-Endpoint-Config">
                 <pre-handler-chain name="recording-handlers" protocol-bindings="##SOAP11_HTTP ##SOAP11_HTTP_MTOM ##SOAP12_HTTP ##SOAP12_HTTP_MTOM">
@@ -314,47 +272,35 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
     </profile>
-
     <interfaces>
         <interface name="management">
-            <inet-address value="${jboss.bind.address.management:0.0.0.0}"/>
+            <inet-address value="${jboss.bind.address.management:127.0.0.1}"/>
         </interface>
         <interface name="public">
-            <inet-address value="${jboss.bind.address:0.0.0.0}"/>
+            <inet-address value="${jboss.bind.address:127.0.0.1}"/>
         </interface>
+        <!-- TODO - only show this if the jacorb subsystem is added  -->
         <interface name="unsecure">
-            <inet-address value="${jboss.bind.address.unsecure:0.0.0.0}"/>
-        </interface>
-        <interface name="http">
-            <inet-address value="0.0.0.0"/>
-        </interface>
-        <interface name="httpspub">
-            <inet-address value="0.0.0.0"/>
-        </interface>
-        <interface name="httpspriv">
-            <inet-address value="0.0.0.0"/>
+            <!--
+              ~  Used for IIOP sockets in the standard configuration.
+              ~                  To secure JacORB you need to setup SSL 
+              -->
+            <inet-address value="${jboss.bind.address.unsecure:127.0.0.1}"/>
         </interface>
     </interfaces>
-
     <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
         <socket-binding name="management-native" interface="management" port="${jboss.management.native.port:9999}"/>
         <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:9990}"/>
         <socket-binding name="management-https" interface="management" port="${jboss.management.https.port:9443}"/>
         <socket-binding name="ajp" port="8009"/>
+        <socket-binding name="http" port="8080"/>
         <socket-binding name="https" port="8443"/>
         <socket-binding name="osgi-http" interface="management" port="8090"/>
         <socket-binding name="remoting" port="4447"/>
         <socket-binding name="txn-recovery-environment" port="4712"/>
         <socket-binding name="txn-status-manager" port="4713"/>
-        <socket-binding name="http" interface="http" port="8080"/>
-        <socket-binding name="httpspriv" interface="httpspriv" port="8443"/>
-        <socket-binding name="httpspub" interface="httpspub" port="8442"/>
         <outbound-socket-binding name="mail-smtp">
             <remote-destination host="localhost" port="25"/>
         </outbound-socket-binding>
-        <outbound-socket-binding name="ejbca-mail-smtp">
-            <remote-destination host="localhost" port="25"/>
-        </outbound-socket-binding>
     </socket-binding-group>
-
 </server>
