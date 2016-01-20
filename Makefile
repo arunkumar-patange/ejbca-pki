@@ -52,6 +52,6 @@ sh:
 	$(HIDE)eval $(docker env docker-gui)
 
 clean-all:
-	-$(HIDE)docker stop $(docker ps -aq)
-	-$(HIDE)docker rm $(docker ps -aq)
-	-$(HIDE)docker rmi $(docker images -q)
+	-$(HIDE)docker ps -aq | xargs docker stop
+	-$(HIDE)docker ps -aq | xargs docker rm
+	-$(HIDE)docker images -q| xargs docker rmi
