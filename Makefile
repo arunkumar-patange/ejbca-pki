@@ -50,3 +50,8 @@ postgresdb:
 
 sh:
 	$(HIDE)eval $(docker env docker-gui)
+
+clean-all:
+	-$(HIDE)docker stop $(docker ps -aq)
+	-$(HIDE)docker rm $(docker ps -aq)
+	-$(HIDE)docker rmi $(docker images -q)
