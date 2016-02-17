@@ -18,11 +18,12 @@ RUN \
 
 RUN pip install supervisor==3.2
 
+ADD . /ejbca/src
+WORKDIR /ejbca/src
+
 RUN wget http://download.jboss.org/jbossas/7.1/jboss-as-7.1.1.Final/jboss-as-7.1.1.Final.zip;unzip jboss-as-7.1.1.Final.zip -d /ejbca/src
 RUN wget http://downloads.sourceforge.net/project/ejbca/ejbca6/ejbca_6_3_1_1/ejbca_ce_6_3_1_1.zip;unzip boss-as-7.1.1.Final.zip -d /ejbca/src
 
-ADD . /ejbca/src
-WORKDIR /ejbca/src
 
 
 ENV JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
