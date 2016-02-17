@@ -10,40 +10,43 @@
 
 SHELL := /bin/bash
 HIDE ?= @
-INAME ?= onelogin/ejbca
-CNAME ?= ejbca
+DOCKER_IMAGE ?= onelogin/ejbca
+DOCKER_CONTAINER ?= ejbca
 
+-include ./registry/registry.mk
 
 PHONY: postgresdb
 
 image:
-	$(HIDE)docker build -t $(INAME) .
+	$(HIDE) docker build -t $(DOCKER_IMAGE) -f Dockerfile.prod
+	$(MAKE) _deploy
+
+_deploy:
+	$(HIDE) echo 'should be called only once'
 	$(HIDE)docker run --name ant-deploy \
 		--link postgres \
-		-v $(PWD):/ejbca/src \
-		$(INAME)
-	$(HIDE)docker commit ant-deploy $(INAME):deploy
+		$(DOCKER_IMAGE)
+	$(HIDE)docker commit ant-deploy $(DOCKER_IMAGE)
 	$(HIDE)docker rm ant-deploy
 
 start:
-	$(HIDE)docker run -it --name $(CNAME) \
+	$(HIDE)docker run -it --name $(DOCKER_CONTAINER) \
 		--link postgres \
 		-p 8080:8080 \
 		-p 8443:8443 \
 		-p 8442:8442 \
 		-p 9990:9990 \
-		-v $(PWD):/ejbca/src \
-		-d $(INAME):deploy \
+		-d $(DOCKER_IMAGE) \
 		/ejbca/src/run.sh
 
 enter:
-	#$(HIDE)docker attach $(CNAME)
-	$(HIDE)docker exec -it $(CNAME) /bin/bash
+	#$(HIDE)docker attach $(DOCKER_CONTAINER)
+	$(HIDE)docker exec -it $(DOCKER_CONTAINER) /bin/bash
 
 stop:
 	-$(HIDE)docker rm ant-deploy
-	$(HIDE)docker stop $(CNAME)
-	$(HIDE)docker rm $(CNAME)
+	$(HIDE)docker stop $(DOCKER_CONTAINER)
+	$(HIDE)docker rm $(DOCKER_CONTAINER)
 
 postgresdb:
 	$(HIDE)docker run --name postgres -e POSTGRES_PASSWORD=postgres -d postgres
