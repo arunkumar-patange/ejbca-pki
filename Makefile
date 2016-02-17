@@ -18,7 +18,7 @@ DOCKER_CONTAINER ?= ejbca
 PHONY: postgresdb
 
 image:
-	$(HIDE) docker build -t $(DOCKER_IMAGE) -f Dockerfile.prod
+	$(HIDE) docker build -t $(DOCKER_IMAGE) -f Dockerfile.prod .
 	$(MAKE) _deploy
 
 _deploy:
